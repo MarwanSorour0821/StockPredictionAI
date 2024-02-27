@@ -41,16 +41,30 @@ df.reset_index(inplace=True)
 df.tail(10)
 
 plt.figure(figsize=(15, 10))
-plt.subplots(top = 1.25, bottom = 1.2)
+plt.subplots_adjust(top = 1.25, bottom = 1.2)
 
-for i, company in enumerate(tech_list):
+#We use 1 here for the enumerate because subplot takes values only between 1<= and <= 4
+for i, company_stock_symbol in enumerate(tech_list, 1):
     plt.subplot(2,2, i)
-    company['Adj Close'].plot()
-    plt.title(f'Closing of {company}')
+
+    #Get Closing data for current compnay symbol
+    company_df = company_data[company_stock_symbol]
+    company_df['Adj Close'].plot()
+    plt.title(f'Closing of {tech_list[i - 1]}')
     plt.ylabel("Adj Closing Price")
     plt.xlabel(None)
 
+    #Get Volume data for current company symbol
+    company_df['Volume'].plot()
+    plt.title(f'Total volume traded each day for {tech_list[i-1]}')
+    plt.ylabel("Volume Traded")
+    plt.xlabel(None)
+
 plt.tight_layout()
+plt.show()
+
+
+
 
 #Valid periods are: 1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max
 #print(msft.history(period="max"))
