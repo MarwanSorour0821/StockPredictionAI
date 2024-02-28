@@ -6,6 +6,7 @@ import seaborn as sns
 from pandas_datareader.data import DataReader
 from pandas_datareader import data as pdr
 from datetime import datetime
+import numpy as np
 
 #--------------------------------------------------------- GETTING COMPANY DATA -----------------------------------------------------------------#
 #sns that set aesthetic style of plots
@@ -154,4 +155,22 @@ sns.jointplot(x='GOOG', y='MSFT', data = tech_rets, kind='scatter', color='seagr
 plt.show()
 
 sns.pairplot(tech_rets, kind='reg')
+plt.show()
+
+#============================================================= Calculating Risk of Stock ================================================================#
+#We will use standard deviation to measure the risk because it is a commonly used measure of risk in financial investments
+#This is because it will show us how much the returns of the stock deviate from the expected value
+
+rets = tech_rets.dropna()
+area = np.pi * 20
+
+
+plt.figure(figsize=(10,8))
+plt.scatter(rets.mean(), rets.std(), s=area)
+plt.xlabel('Expected Return')
+plt.ylabel('Risk')
+
+for label, x, y in zip(rets.columns, rets.mean(), rets.std()):
+    plt.annotate(label, xy=(x, y), xytext=(50, 50), textcoords='offset points', ha='right', va='bottom', 
+                 arrowprops=dict(arrowstyle='-', color='blue', connectionstyle='arc3,rad=-0.3'))
 plt.show()
