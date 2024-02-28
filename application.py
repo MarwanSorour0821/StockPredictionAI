@@ -7,6 +7,7 @@ from pandas_datareader.data import DataReader
 from pandas_datareader import data as pdr
 from datetime import datetime
 import numpy as np
+from sklearn.preprocessing import MinMaxScaler
 
 #--------------------------------------------------------- GETTING COMPANY DATA -----------------------------------------------------------------#
 #sns that set aesthetic style of plots
@@ -184,3 +185,35 @@ plt.title("Closing History of Apple")
 plt.xlabel("Date", fontsize=18)
 plt.ylabel("Closing Price USD ($)", fontsize=18)
 plt.show()
+
+data = df.filter(['Close'])
+data_set = data.values
+
+#Get number of rows to train model on
+training_data_length = int(np.ceil(len(data_set) * 0.95))
+
+#Scaling the data
+scaler = MinMaxScaler(feature_range=(0,1))
+scaled_data = scaler.fit_transform(data_set)
+
+# Create the training data set 
+# Create the scaled training data set
+train_data = scaled_data[0:int(training_data_length), :]
+
+# Split the data into x_train and y_train data sets
+x_train = []
+y_train = []
+
+for i in range(60, len(train_data)):
+    x_train.append(train_data[i-60:i, 0])
+    y_train.append(train_data[i, 0])
+    if i<= 61:
+        print(x_train)
+        print(y_train)
+        print()
+
+# Convert the x_train and y_train to numpy arrays 
+x_train, y_train = np.array(x_train), np.array(y_train)
+
+# Reshape the data
+x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
