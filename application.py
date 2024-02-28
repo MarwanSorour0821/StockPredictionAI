@@ -174,3 +174,13 @@ for label, x, y in zip(rets.columns, rets.mean(), rets.std()):
     plt.annotate(label, xy=(x, y), xytext=(50, 50), textcoords='offset points', ha='right', va='bottom', 
                  arrowprops=dict(arrowstyle='-', color='blue', connectionstyle='arc3,rad=-0.3'))
 plt.show()
+
+#================================================================ Training AI Model =====================================================================+#
+print("predicting stock price of apple")
+df = pdr.get_data_yahoo('AAPL', start='2012-01-01', end=datetime.now())
+
+plt.figure(figsize=(16,6))
+plt.title("Closing History of Apple")
+plt.xlabel("Date", fontsize=18)
+plt.ylabel("Closing Price USD ($)", fontsize=18)
+plt.show()
