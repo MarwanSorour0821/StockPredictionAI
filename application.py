@@ -111,7 +111,6 @@ axes[0,0].set_title('AMAZON')
 fig.tight_layout()
 plt.show()
 #Valid periods are: 1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max
-#print(msft.history(period="max"))
 
 #=========================================================================Calculating Daily Returns =====================================================#
 
@@ -206,77 +205,16 @@ train_data = scaled_data[0:int(training_data_length), :]
 x_train = []
 y_train = []
 
-# #Tested on 60 historical trading days 
-# for i in range(60, len(train_data)):
-#     #appends a sequence of historical closing prices to the x_train list. The sequence is extracted from the train_data array, 
-#     #starting from index i-60 (60 days before the current day i) up to index i-1 (the day just before the current day i). 
-#     #The [:, 0] indexing selects only the closing prices from this sequence. So essentially, x_train is a list of sequences, 
-#     #each containing 60 historical closing prices.
-#     x_train.append(train_data[i-60:i, 0])
-#     y_train.append(train_data[i, 0])
-#     if i<= 61:
-#         print(x_train)
-#         print(y_train)
-#         print()
-
-# # Convert the x_train and y_train to numpy arrays 
-# x_train, y_train = np.array(x_train), np.array(y_train)
-
-# # Reshape the data into a 3 dimensional array since many machine learnign libraries require this format
-# x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
-
-# #TRAIN THE MODEL ON  TRAIN SET
-# #Build LSTM Model
-# model = Sequential()
-# model.add(LSTM(128, return_sequences=True, input_shape= (x_train.shape[1], 1)))
-# model.add(LSTM(64, return_sequences=False))
-# model.add(Dense(25))
-# model.add(Dense(1))
-
-# # Compile the model
-# model.compile(optimizer='adam', loss='mean_squared_error')
-
-# # Train the model
-# model.fit(x_train, y_train, batch_size=1, epochs=1)
-
-# #============================================================= BUIlD TESTING DATA ========================================================================#
+#============================================================= BUIlD TESTING DATA ========================================================================#
 
 # # Create the testing data set
 # # Create a new array containing scaled values from index 1543 to 2002 
 # test_data = scaled_data[training_data_length - 60: , :]
 # # Create the data sets x_test and y_test
 x_test = []
-# y_test = data_set[training_data_length:, :]
-# for i in range(60, len(test_data)):
-#     x_test.append(test_data[i-60:i, 0])
 
 # #convert to numpy array
 x_test = np.array(x_test)
-
-# #Reshape to 3 dimensional array
-# x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1 ))
-
-# predictions = model.predict(x_test)
-# predictions = scaler.inverse_transform(predictions)
-
-# #Get root mean square
-# rmse = np.sqrt(np.mean(((predictions - y_test) ** 2)))
-
-# # Plot the data
-# train = data[:training_data_length]
-# valid = data[training_data_length:]
-# valid['Predictions'] = predictions
-# # Visualize the data
-# plt.figure(figsize=(16,6))
-# plt.title('Model')
-# plt.xlabel('Date', fontsize=18)
-# plt.ylabel('Close Price USD ($)', fontsize=18)
-# plt.plot(train['Close'])
-# plt.plot(valid[['Close', 'Predictions']])
-# plt.legend(['Train', 'Val', 'Predictions'], loc='lower right')
-# plt.show()
-
-# print(valid[['Close', 'Predictions']])
 
 # Adjusting hyperparameters
 learning_rate = 0.001
@@ -302,7 +240,6 @@ x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
 # Adjusting model architecture
 model = Sequential()
 model.add(LSTM(256, return_sequences=True, input_shape=(x_train.shape[1], 1)))
-# model.add(LSTM(128, return_sequences=True, input_shape=(x_train.shape[1], 1)))
 model.add(Dropout(0.2))  # Adding dropout layer for regularization
 model.add(LSTM(128, return_sequences=True))
 model.add(Dropout(0.2))
@@ -315,18 +252,6 @@ model.compile(optimizer=optimizer, loss='mean_squared_error')
 
 # Training the model with more epochs
 model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, validation_split=0.1, verbose=1)
-
-print("GGGG")
-
-# for i in range(60, len(train_data)):
-#     x_train.append(train_data[i-60:i, :])  # Including all features
-#     y_train.append(train_data[i, 0])  # Target remains the same (closing price)
-
-# x_train, y_train = np.array(x_train), np.array(y_train)
-# x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
-
-# # Retraining the model with updated input data
-# model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, validation_split=0.1, verbose=1)
 
 # Getting testing data
 for i in range(60, len(test_data)):
