@@ -8,6 +8,8 @@ from pandas_datareader import data as pdr
 from datetime import datetime
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
+from keras.models import Sequential
+from keras.layers import Dense, LSTM
 
 #--------------------------------------------------------- GETTING COMPANY DATA -----------------------------------------------------------------#
 #sns that set aesthetic style of plots
@@ -193,6 +195,7 @@ data_set = data.values
 training_data_length = int(np.ceil(len(data_set) * 0.95))
 
 #Scaling the data
+#MinMaxScaler is used to scale the data between 0 and 1. This is used to train many AI models to ensure that all data have the same scale
 scaler = MinMaxScaler(feature_range=(0,1))
 scaled_data = scaler.fit_transform(data_set)
 
@@ -204,7 +207,12 @@ train_data = scaled_data[0:int(training_data_length), :]
 x_train = []
 y_train = []
 
+#Tested on 60 historical trading days 
 for i in range(60, len(train_data)):
+    #appends a sequence of historical closing prices to the x_train list. The sequence is extracted from the train_data array, 
+    #starting from index i-60 (60 days before the current day i) up to index i-1 (the day just before the current day i). 
+    #The [:, 0] indexing selects only the closing prices from this sequence. So essentially, x_train is a list of sequences, 
+    #each containing 60 historical closing prices.
     x_train.append(train_data[i-60:i, 0])
     y_train.append(train_data[i, 0])
     if i<= 61:
@@ -215,5 +223,21 @@ for i in range(60, len(train_data)):
 # Convert the x_train and y_train to numpy arrays 
 x_train, y_train = np.array(x_train), np.array(y_train)
 
-# Reshape the data
+# Reshape the data into a 3 dimensional array since many machine learnign libraries require this format
 x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
+
+#TRAIN THE MODEL ON  TRAIN SET
+#Build LSTM Model
+model = Sequential()
+model.add(LSTM(128, return_sequences=True, input_shape= (x_train.shape[1], 1)))
+model.add(LSTM(64, return_sequences=False))
+model.add(Dense(25))
+model.add(Dense(1))
+
+# Compile the model
+model.compile(optimizer='adam', loss='mean_squared_error')
+
+# Train the model
+model.fit(x_train, y_train, batch_size=1, epochs=1)
+
+
