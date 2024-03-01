@@ -116,22 +116,11 @@ fig, axes = plt.subplots(nrows=2, ncols=2)
 fig.set_figheight(10)
 fig.set_figwidth(15)
 
-AAPL = company_data['AAPL']
-GOOG = company_data['GOOG']
-MSFT = company_data['MSFT']
-AMZN = company_data['AMZN']
+stock_data = company_data[stock_symbol_input]
 
-AAPL[['Adj Close', 'MA - 10 days', 'MA - 20 days', 'MA - 50 days']].plot(ax=axes[0,0])
+
+stock_data[['Adj Close', 'MA - 10 days', 'MA - 20 days', 'MA - 50 days']].plot(ax=axes[0,0])
 axes[0,0].set_title('APPLE')
-
-GOOG[['Adj Close', 'MA - 10 days', 'MA - 20 days', 'MA - 50 days']].plot(ax=axes[0,1])
-axes[0,0].set_title('GOOGLE')
-
-MSFT[['Adj Close', 'MA - 10 days', 'MA - 20 days', 'MA - 50 days']].plot(ax=axes[1,0])
-axes[0,0].set_title('MICROSOFT')
-
-AMZN[['Adj Close', 'MA - 10 days', 'MA - 20 days', 'MA - 50 days']].plot(ax=axes[1,1])
-axes[0,0].set_title('AMAZON')
 
 fig.tight_layout()
 plt.show()
@@ -151,39 +140,34 @@ for company in  company_data:
     company_df['Daily Return'] = company_df['Adj Close'].pct_change() * 100
     company_df.dropna(subset=['Daily Return'], inplace=True)
 
-AAPL['Daily Return'].plot(ax = axess[0,0], legend=True, linestyle='--', marker='o')
-axess[0,0].set_title('Apple Daily Returns')
-GOOG['Daily Return'].plot(ax=axess[0,1], legend=True, linestyle='--', marker='o')
-axess[0,1].set_title('Google Daily Returns')
-MSFT['Daily Return'].pct_change().plot(ax=axess[1,0], legend=True, linestyle='--', marker='o')
-axess[1,0].set_title('Microsoft Daily Returns')
-AMZN['Daily Return'].plot(ax=axess[1,1], legend=True, linestyle='--', marker='o')
-axess[1,1].set_title('Amazon Daily Returns')
+stock_data['Daily Return'].plot(ax = axess[0,0], legend=True, linestyle='--', marker='o')
+axess[0,0].set_title(f'{stock_symbol_input} Daily Returns')
+
 fig1.tight_layout()
 plt.show()
 
-for i, company in enumerate(tech_list, 1):
-     plt.subplot(2,2,i)
-     company_df = company_data[company]
-     plt.hist(company_df['Daily Return'], bins=50)
-     plt.xlabel('Daily Returns')
-     plt.ylabel('Counts')
-     plt.title(f'{tech_list[i - 1]}')
+
+plt.figure(figsize=(10,8))
+company_df = company_data[stock_symbol_input]
+plt.hist(company_df['Daily Return'], bins=50)
+plt.xlabel('Daily Returns')
+plt.ylabel('Counts')
+plt.title(f'{stock_symbol_input}')
 plt.tight_layout()
 plt.show()
 
 #============================================================== Pair Correlation of Companies ==========================================================#
 
-closing_df = pdr.get_data_yahoo(tech_list, start=start, end=end)['Adj Close']
+closing_df = pdr.get_data_yahoo(stock_symbol_input, start=start, end=end)['Adj Close']
 
 # Make a new DataFrame to store the percentage change of Adj Close
 tech_rets = closing_df.pct_change()
 
-sns.jointplot(x='GOOG', y='MSFT', data = tech_rets, kind='scatter', color='seagreen')
-plt.show()
+# sns.jointplot(x=stock_symbol_input, y=stock_symbol_input, data = tech_rets, kind='scatter', color='seagreen')
+# plt.show()
 
-sns.pairplot(tech_rets, kind='reg')
-plt.show()
+# sns.pairplot(tech_rets, kind='reg')
+# plt.show()
 
 #============================================================= Calculating Risk of Stock ================================================================#
 #We will use standard deviation to measure the risk because it is a commonly used measure of risk in financial investments
@@ -198,9 +182,9 @@ plt.scatter(rets.mean(), rets.std(), s=area)
 plt.xlabel('Expected Return')
 plt.ylabel('Risk')
 
-for label, x, y in zip(rets.columns, rets.mean(), rets.std()):
-    plt.annotate(label, xy=(x, y), xytext=(50, 50), textcoords='offset points', ha='right', va='bottom', 
-                 arrowprops=dict(arrowstyle='-', color='blue', connectionstyle='arc3,rad=-0.3'))
+# for label, x, y in zip(rets.columns, rets.mean(), rets.std()):
+#     plt.annotate(label, xy=(x, y), xytext=(50, 50), textcoords='offset points', ha='right', va='bottom', 
+#                  arrowprops=dict(arrowstyle='-', color='blue', connectionstyle='arc3,rad=-0.3'))
 plt.show()
 
 #================================================================ Training AI Model =====================================================================+#
@@ -211,7 +195,7 @@ data = df.filter(['Close'])
 data_set = data.values
 
 #Get number of rows to train model on
-training_data_length = int(np.ceil(len(data_set) * 0.95))
+training_data_length = int(np.ceil(len(data_set) * 0.98))
 
 # #Scaling the data
 # #MinMaxScaler is used to scale the data between 0 and 1. This is used to train many AI models to ensure that all data have the same scale
@@ -241,7 +225,7 @@ epochs = 20
 batch_size = 64
 
 # Increase training data length
-training_data_length = int(np.ceil(len(data_set) * 0.98))  # Using 98% of the data for training
+#training_data_length = int(np.ceil(len(data_set) * 0.98))  # Using 98% of the data for training
 
 test_data = scaled_data[training_data_length - 60:, :]
 x_test = []
