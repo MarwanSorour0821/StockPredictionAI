@@ -45,9 +45,6 @@ plt.style.use("fivethirtyeight")
 #To use yfinance under the hood when trying to retrieve data
 yf.pdr_override()
 
-#The list of companies that we want to predict the stocks for
-#tech_list = ['AAPL', 'GOOG', 'MSFT', 'AMZN']
-
 #set up start and end dates
 end = datetime.now()
 start = datetime(end.year - 1, end.month, end.day)
@@ -74,8 +71,6 @@ plt.subplots_adjust(top = 1.25, bottom = 1.2)
 
 #We use 1 here for the enumerate because subplot takes values only between 1<= and <= 4
 
-#plt.subplot(2,2)
-
 plt.figure(figsize=(10,8))
 #Get Closing data for current compnay symbol
 company_df = company_data[stock_symbol_input]
@@ -91,7 +86,7 @@ print("Proceeding to volume")
 
 plt.figure(figsize=(10,8))
 
-#plt.subplot(2,2,i)
+
 #Get Volume data for current company symbol
 company_df = company_data[stock_symbol_input]
 company_df['Volume'].plot()
@@ -112,15 +107,12 @@ for ma in ma_day:
         company_df = company_data[company]
         company_df[column_name] = company_df['Adj Close'].rolling(ma).mean()
 
-fig, axes = plt.subplots(nrows=2, ncols=2)
-fig.set_figheight(10)
-fig.set_figwidth(15)
+fig = plt.figure(figsize=(16, 6))
 
 stock_data = company_data[stock_symbol_input]
 
 
-stock_data[['Adj Close', 'MA - 10 days', 'MA - 20 days', 'MA - 50 days']].plot(ax=axes[0,0])
-axes[0,0].set_title('APPLE')
+stock_data[['Adj Close', 'MA - 10 days', 'MA - 20 days', 'MA - 50 days']].plot().set_title(f'{stock_symbol_input}')
 
 fig.tight_layout()
 plt.show()
@@ -128,9 +120,7 @@ plt.show()
 
 #=========================================================================Calculating Daily Returns =====================================================#
 
-fig1, axess = plt.subplots(nrows=2, ncols=2)
-fig1.set_figheight(10)
-fig1.set_figwidth(15)
+fig1 = plt.figure(figsize=(16, 6))
 
 for company in  company_data:
         #company_df = company_data[company]
@@ -140,8 +130,7 @@ for company in  company_data:
     company_df['Daily Return'] = company_df['Adj Close'].pct_change() * 100
     company_df.dropna(subset=['Daily Return'], inplace=True)
 
-stock_data['Daily Return'].plot(ax = axess[0,0], legend=True, linestyle='--', marker='o')
-axess[0,0].set_title(f'{stock_symbol_input} Daily Returns')
+stock_data['Daily Return'].plot(legend=True, linestyle='--', marker='o').set_title(f'{stock_symbol_input} Daily Returns')
 
 fig1.tight_layout()
 plt.show()
